@@ -11,6 +11,8 @@ on:
 jobs:
   scheduled:
     runs-on: ubuntu-latest
+    permissions:
+        contents: write
     steps:
       - name: Setup timezone
         uses: zcong1993/setup-timezone@master
