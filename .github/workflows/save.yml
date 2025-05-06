@@ -1,0 +1,35 @@
+name: Download photo and add to repo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup timezone
+        uses: zcong1993/setup-timezone@master
+        with:
+          timezone: America/New_York
+      - name: Check out this repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download photo and add to repo
+        run: |
+            NAME=`date +"%Y-%m-%d %H:%M:%S.jpg"`
+            DATAPATH=`date +"data/%Y/%m/%d"`
+            URL="https://webcams.nyctmc.org/api/cameras/f801cf2f-cd02-4077-aa53-99ee8a00e1ab/image"
+            TIMESTAMP=$(date -u)
+            mkdir -p $DATAPATH
+            curl -o $DATAPATH/$NAME $URL
+            git config user.name "Automated"
+            git config user.email "actions@users.noreply.github.com"
+            git add -A
+            git commit -m "Latest data: ${TIMESTAMP}" || exit 0
+            git push
